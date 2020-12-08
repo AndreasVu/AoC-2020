@@ -5,24 +5,24 @@ const inputFile = fs.readFileSync(path.resolve(__dirname, "input.txt"), 'utf-8')
 
 function runProgram(list: Array<string>): [boolean, number] {
     let index = 0;
-    let usedIndecies = {};
+    let usedIndices = {};
     let accumulator = 0;
-    while (usedIndecies[index] == null) {
+    while (usedIndices[index] == null) {
         let opCode = list[index].split(" ");
         switch (opCode[0]) {
             case "acc": {
                 accumulator += opCode[1].substr(0, 1) == "+" ? +opCode[1].substr(1, opCode[1].length - 1) : - +opCode[1].substr(1, opCode[1].length - 1);
-                usedIndecies[index] = true;
+                usedIndices[index] = true;
                 index++;
                 break;
             }
             case "jmp": {
-                usedIndecies[index] = true;
+                usedIndices[index] = true;
                 index += opCode[1].substr(0, 1) == "+" ? +opCode[1].substr(1, opCode[1].length - 1) : - +opCode[1].substr(1, opCode[1].length - 1);
                 break;
             }
             case "nop": {
-                usedIndecies[index] = true;
+                usedIndices[index] = true;
                 index++;
                 break;
             }
@@ -57,7 +57,6 @@ function solvePart2() {
                 console.log(result[1]);
             }
         }
-        
     })
 }
 
