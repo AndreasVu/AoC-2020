@@ -4,66 +4,53 @@ import * as path from 'path';
 const inputFile = fs.readFileSync(path.resolve(__dirname, "input.txt"), 'utf-8').split("\n");
 const attRegEx = new RegExp("([a-z]+):(#?([a-z]|[0-9])+)+", 'g')
 
-export interface PassPort {
-    byr: string,
-    iyr: string, 
-    eyr: string, 
-    hgt: string, 
-    hcl: string, 
-    ecl: string, 
-    pid: string, 
-    cid: string
-}
-
-function validate1(passport: PassPort): boolean {
-    let validEntries = 0;
+function validate1(passport: any): boolean {
+    let validValues = 0;
     const length = Object.keys(passport).length;
     for (const [key, value] of Object.entries(passport)) {
         if (value != "") {
-            validEntries++;
+            validValues++;
         } else {
             if (key == "cid")
-                validEntries++;
+                validValues++;
         }
     }
-    return validEntries == length;
+    return validValues == length;
 }
 
 // Scuffed
-function validate2(passport: PassPort): boolean {
-    let validEntries = 0;
+function validate2(passport: any): boolean {
+    let validValues = 0;
     const length = Object.keys(passport).length;
 
     for (const [key, value] of Object.entries(passport)) {
         switch (key) {
             case "byr": {
-                if (+value >= 1920 && +value <= 2002 ) validEntries++;
+                validValues += +(+value >= 1920 && +value <= 2002 );
                 break;
             }
             case "iyr": {
-                if (+value >= 2010 && +value <= 2020 ) validEntries++;
+                validValues += +(+value >= 2010 && +value <= 2020 );
                 break;
             }
             case "eyr": {
-                if (+value >= 2020 && +value <= 2030 ) validEntries++;
+                validValues += +(+value >= 2020 && +value <= 2030 );
                 break;
             }
             case "hgt": {
                 let stringValue = String(value);
                 if (stringValue.includes("cm")) {
                     let match = stringValue.match(/^([0-9]+)cm$/);
-                    if (+match[1] >= 150 && +match[1] <= 193) validEntries++;
+                    validValues += +(+match[1] >= 150 && +match[1] <= 193);
                     break;
                 } else if (stringValue.includes("in")) {
                     let match = stringValue.match(/^([0-9]+)in$/);
-                    if (+match[1] >= 59 && +match[1] <= 76) validEntries++;
+                    validValues += +(+match[1] >= 59 && +match[1] <= 76);
                     break;
                 }
             }
             case "hcl": {
-                if (String(value).match(/^#([a-z]|[0-9]){6}$/) != null) {
-                    validEntries++;
-                }
+                validValues += +(String(value).match(/^#([a-z]|[0-9]){6}$/) != null);
                 break;
             }
             case "ecl": {
@@ -73,30 +60,24 @@ function validate2(passport: PassPort): boolean {
                     if (String(value) == color)
                         isValidColor = true;
                 })
-                if (isValidColor){
-                    validEntries++;
-                }
+                validValues += +(isValidColor);
                 break;
             }
-
             case "pid": {
-                if (String(value).match(/^[0-9]{9}$/) != null) {
-                    console.log(value);
-                    validEntries++;
-                }
+                validValues += +(String(value).match(/^[0-9]{9}$/) != null);
                 break;
             }
             default: {
-                validEntries++;
+                validValues++;
             }
         }
     }
-    return validEntries == length;
+    return validValues == length;
 }
 
-function solvePart1() {
+function solve() {
     const defaultPassPort = {byr: "", iyr: "", eyr: "", hgt: "", hcl: "", ecl: "", pid: "", cid: ""};
-    let tempPassPort: PassPort = Object.assign([], defaultPassPort);
+    let tempPassPort = Object.assign([], defaultPassPort);
     let counter1 = 0;
     let counter2 = 0;
 
@@ -108,12 +89,12 @@ function solvePart1() {
                 tempPassPort[group[1]] = group[2];
             }
         } else {
-            if (validate1(tempPassPort)) counter1++;
-            if (validate2(tempPassPort)) counter2++;
+            counter1 += +(validate1(tempPassPort));
+            counter2 += +(validate2(tempPassPort));
             tempPassPort = Object.assign([], defaultPassPort);
         }
     }
     console.log(counter1);
     console.log(counter2);
 }
-solvePart1();
+solve();
